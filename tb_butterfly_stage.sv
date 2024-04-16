@@ -1,0 +1,51 @@
+`timescale 1ns / 1ps
+
+module tb_butterfly(
+
+    );
+
+logic  [49:0] signal_a_i;
+logic  [49:0] signal_b_i;
+logic         clk_i;
+logic         rst_i;
+
+
+always begin
+    #10 clk_i = ~clk_i;
+end
+
+butterfly dut1(
+.clk_i(clk_i),
+.rst_i(rst_i),
+.signal_a_i(signal_a_i),
+.signal_b_i(signal_b_i)
+);
+
+initial 
+begin
+clk_i = 0;
+rst_i = 1;
+signal_a_i = 50'b00000000000000000000000010000000000000000000000001;
+signal_b_i = 50'b00000000000000000000000010000000000000000000000000;
+
+#20
+rst_i = 0;
+signal_a_i = 50'b00000000000000000000000000000000000000000000000001;
+signal_b_i = 50'b00000000000000000000000000000000000000000000000000;
+
+#20
+rst_i = 0;
+signal_a_i = 50'b10000000000000000000000110000000000000000000000001;
+signal_b_i = 50'b00000000000000000000000010000000000000000000000000;
+
+#20
+rst_i = 0;
+signal_a_i = 50'b00000000000000000000000101000000000000000000000010;
+signal_b_i = 50'b00000000000000000000000110000000000000000000000000;
+
+
+end
+
+
+
+endmodule
