@@ -2,7 +2,7 @@
 
   module dsp_mult(
     input  logic        clk_i,
-    input  logic        reset_i,
+    input  logic        rst_i,
     input  logic [49:0] stage_i,
     input  logic [35:0] w_i,
     input  logic        data_valid_i,
@@ -96,10 +96,11 @@
     reg1_mult_aB <= mult_aB;
   end
   
-  always_ff @(posedge clk3)
+  always_ff @(posedge clk3) begin
     mult_reg_im2 <= mult_reg_im1;
     mult_reg_re <= mult_re;
     reg2_mult_aB <= reg1_mult_aB;
+  end
 
   assign mult_Ab = $signed(w_im_reg2) * $signed(s_re_reg2);
   assign mult_aB = $signed(s_im_reg1) * $signed(w_im_reg1);
