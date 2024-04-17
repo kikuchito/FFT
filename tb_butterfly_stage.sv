@@ -1,11 +1,9 @@
 `timescale 1ns / 1ps
 
-module tb_butterfly(
+module tb_butterfly();
 
-    );
-
-logic  [49:0] signal_tb [7:0];
-logic  [49:0] stage1_tb [7:0];
+logic  [49:0] signal_tb      [7:0];
+logic  [49:0] final_stage_tb [7:0];
 logic         clk;
 logic         rst;
 
@@ -23,12 +21,11 @@ butterfly_stage butterfly_inst(
 .clk_i( clk ),
 .rst_i( rst ),
 .signal( signal_tb ),
-.stage1( stage1_tb )
+.final_stage( final_stage_tb )
 );
 
 initial 
 begin
-clk = 0;
 rst = 1;
 
 #20
@@ -44,8 +41,7 @@ signal_tb[5] = 50'b10000000000000000000000110000000000000000000000001;
 signal_tb[6] = 50'b00000000000000000000000010000000000000000000000000;
 signal_tb[7] = 50'b00000000000000000000000101000000000000000000000010;
 
-#20
-rst = 1;
+
 
 end
 
