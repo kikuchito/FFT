@@ -77,7 +77,7 @@
     if (rst_i)
       output_valid_ff <= '0;
     else
-      output_valid_ff <= data_valid_stage_4_ff;
+      output_valid_ff <= data_valid_stage_3_ff;
 
   always_ff @(posedge clk1) begin
     s_re_reg1 <= s_input_ff_re;
@@ -118,6 +118,7 @@
   assign clk2 = data_valid_stage_1_ff && clk_i;
   assign clk3 = data_valid_stage_2_ff && clk_i;
   assign clk4 = data_valid_stage_3_ff && clk_i;
+  assign data_valid_o = output_valid_ff;
   // assign clk5 = data_valid_stage_4_ff && clk_i;
 
   endmodule
