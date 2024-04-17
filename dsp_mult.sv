@@ -100,6 +100,7 @@
     mult_reg_im2 <= mult_reg_im1;
     mult_reg_re <= mult_re;
     reg2_mult_aB <= reg1_mult_aB;
+    reg_mult_Ab <= mult_Ab;
   end
 
   assign mult_Ab = $signed(w_im_reg2) * $signed(s_re_reg2);
