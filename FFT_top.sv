@@ -20,7 +20,20 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module FFT_top(
-
+  module FFT_top(
+    input  logic         clk_i,
+    input  logic         reset,
+    input  logic         tvalid,
+    input  logic         tlast,
+    input  logic  [49:0] signal,
+    output logic         tready,
+    output signed [49:0] final_stage, 
     );
+
+  logic [49:0] signal_reg [7:0];
+
+  always_ff @(posedge clk_i) begin
+    if (tvalid && tready)
+  end
+  
 endmodule
