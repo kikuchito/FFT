@@ -4,25 +4,33 @@
   module butterfly_stage(
     input  logic         clk_i,
     input  logic         rst_i,
-    input  logic  [49:0] signal      [7:0],
-    output signed [49:0] final_stage [7:0]
+    input  logic  [49:0] signal,
+    input  logic  [ 2:0] num_of_signal,
+    output signed [49:0] final_stage, 
+    output logic  [ 2:0] final_num
   );
 
   //inner regs
-  logic        [35:0] w          [3:0];
-  logic signed [49:0] stage_reg  [7:0];
-  logic        [43:0] im         [3:0];
-  logic        [43:0] re         [3:0];
-  logic signed [49:0] stage1     [7:0];
-  logic signed [49:0] stage2     [7:0];
-  logic signed [49:0] stage2_reg [7:0];
-  logic signed [49:0] stage3     [7:0];
-  logic signed [49:0] stage3_reg [7:0];
+ 
+  logic        [49:0] signal_reg      [7:0];
+  logic signed [49:0] final_stage_reg [7:0];
+  logic        [35:0] w               [3:0];
+  logic signed [49:0] stage_reg       [7:0];
+  logic        [43:0] im              [3:0];
+  logic        [43:0] re              [3:0];
+  logic signed [49:0] stage1          [7:0];
+  logic signed [49:0] stage2          [7:0];
+  logic signed [49:0] stage2_reg      [7:0];
+  logic signed [49:0] stage3          [7:0];
+  logic signed [49:0] stage3_reg      [7:0];
+
+  logic  [ 2:0] final_num;
 
   //regs for dsp_mult
   logic       valid_reg_i [11:0];
   logic       valid_reg_o [11:0];
-  // logic [2:0] stage_counter_i;
+  // logic [2:0] num_of_signal;
+   // logic [2:0] stage_counter_i;
   // logic [2:0] stage_counter_o;
   // logic [2:0] w_counter;
   // logic [2:0] num_i;
@@ -59,6 +67,25 @@
 
   // assign w_num = w_counter;
 
+  always_ff @(posedge clk_i) begin
+    if (rst_i) begin
+      signal_reg[0] <= '0;
+      signal_reg[1] <= '0; 
+      signal_reg[2] <= '0; 
+      signal_reg[3] <= '0;
+      signal_reg[4] <= '0; 
+      signal_reg[5] <= '0; 
+      signal_reg[6] <= '0;
+      signal_reg[8] <= '0;    
+    end
+
+    else begin
+      signal_reg[num_of_signal][49:0] <= signal;
+    end
+  end
+
+
+
   always_comb begin
     w[0] = { 18'b01_0000000000000000, 18'b0 };
     
@@ -71,15 +98,15 @@
       
   // assign valid_reg_i = '1;
 
-  assign stage_reg[0] = { $signed(signal[0][49:25]) + $signed(signal[4][49:25]), $signed(signal[0][24:0]) + $signed(signal[4][24:0]) };
-  assign stage_reg[1] = { $signed(signal[1][49:25]) + $signed(signal[6][49:25]), $signed(signal[1][24:0]) + $signed(signal[6][24:0]) };
-  assign stage_reg[2] = { $signed(signal[2][49:25]) + $signed(signal[7][49:25]), $signed(signal[2][24:0]) + $signed(signal[7][24:0]) };
-  assign stage_reg[3] = { $signed(signal[3][49:25]) + $signed(signal[5][49:25]), $signed(signal[3][24:0]) + $signed(signal[5][24:0]) };
+  assign stage_reg[0] = { $signed(signal_reg[0][49:25]) + $signed(signal_reg[4][49:25]), $signed(signal_reg[0][24:0]) + $signed(signal_reg[4][24:0]) };
+  assign stage_reg[1] = { $signed(signal_reg[1][49:25]) + $signed(signal_reg[6][49:25]), $signed(signal_reg[1][24:0]) + $signed(signal_reg[6][24:0]) };
+  assign stage_reg[2] = { $signed(signal_reg[2][49:25]) + $signed(signal_reg[7][49:25]), $signed(signal_reg[2][24:0]) + $signed(signal_reg[7][24:0]) };
+  assign stage_reg[3] = { $signed(signal_reg[3][49:25]) + $signed(signal_reg[5][49:25]), $signed(signal_reg[3][24:0]) + $signed(signal_reg[5][24:0]) };
 
-  assign stage_reg[4] = { $signed(signal[0][49:25]) - $signed(signal[4][49:25]), $signed(signal[0][24:0]) - $signed(signal[4][24:0]) }; 
-  assign stage_reg[5] = { $signed(signal[1][49:25]) - $signed(signal[5][49:25]), $signed(signal[1][24:0]) - $signed(signal[5][24:0]) };
-  assign stage_reg[6] = { $signed(signal[2][49:25]) - $signed(signal[6][49:25]), $signed(signal[2][24:0]) - $signed(signal[6][24:0]) };
-  assign stage_reg[7] = { $signed(signal[3][49:25]) - $signed(signal[7][49:25]), $signed(signal[3][24:0]) - $signed(signal[7][24:0]) };
+  assign stage_reg[4] = { $signed(signal_reg[0][49:25]) - $signed(signal_reg[4][49:25]), $signed(signal_reg[0][24:0]) - $signed(signal_reg[4][24:0]) }; 
+  assign stage_reg[5] = { $signed(signal_reg[1][49:25]) - $signed(signal_reg[5][49:25]), $signed(signal_reg[1][24:0]) - $signed(signal_reg[5][24:0]) };
+  assign stage_reg[6] = { $signed(signal_reg[2][49:25]) - $signed(signal_reg[6][49:25]), $signed(signal_reg[2][24:0]) - $signed(signal_reg[6][24:0]) };
+  assign stage_reg[7] = { $signed(signal_reg[3][49:25]) - $signed(signal_reg[7][49:25]), $signed(signal_reg[3][24:0]) - $signed(signal_reg[7][24:0]) };
 
 
   assign stage1[3:0] = stage_reg[3:0];
@@ -198,10 +225,10 @@
   assign stage3_reg[6] = { $signed(stage2[6][49:25]) + $signed(stage2[7][49:25]), $signed(stage2[6][24:0]) + $signed(stage2[7][24:0]) };
   assign stage3_reg[7] = { $signed(stage2[6][49:25]) - $signed(stage2[7][49:25]), $signed(stage2[6][24:0]) - $signed(stage2[7][24:0]) };
 
-  assign final_stage[0] = stage3_reg[0];
-  assign final_stage[2] = stage3_reg[2];
-  assign final_stage[4] = stage3_reg[4];
-  assign final_stage[6] = stage3_reg[5];
+  assign final_stage_reg[0] = stage3_reg[0];
+  assign final_stage_reg[2] = stage3_reg[2];
+  assign final_stage_reg[4] = stage3_reg[4];
+  assign final_stage_reg[6] = stage3_reg[5];
 
   assign valid_reg_i [8] = '1;
   assign valid_reg_i [9] = '1;
@@ -215,7 +242,7 @@
     .w_i(w[0]),
     .data_valid_i(valid_reg_i[8]),
     .data_valid_o(valid_reg_o[8]),
-    .butterfly_stage_o(final_stage[1])
+    .butterfly_stage_o(final_stage_reg[1])
   );
 
   dsp_mult dsp_mult_inst10(
@@ -225,7 +252,7 @@
     .w_i(w[0]),
     .data_valid_i(valid_reg_i[9]),
     .data_valid_o(valid_reg_o[9]),
-    .butterfly_stage_o(final_stage[3])
+    .butterfly_stage_o(final_stage_reg[3])
   );
 
   dsp_mult dsp_mult_inst11(
@@ -235,7 +262,7 @@
     .w_i(w[0]),
     .data_valid_i(valid_reg_i[10]),
     .data_valid_o(valid_reg_o[10]),
-    .butterfly_stage_o(final_stage[5])
+    .butterfly_stage_o(final_stage_reg[5])
   );
 
   dsp_mult dsp_mult_inst12(
@@ -245,9 +272,18 @@
     .w_i(w[0]),
     .data_valid_i(valid_reg_i[11]),
     .data_valid_o(valid_reg_o[11]),
-    .butterfly_stage_o(final_stage[7])
+    .butterfly_stage_o(final_stage_reg[7])
   );
 
+  always_ff @(posedge clk_i) begin
+    if (rst_i)
+      final_num <= '0;
+    else if (final_stage_reg[7] != 49'bx)
+      final_num <= final_num + 1'd1;
+  end
+
+  assign final_stage = final_stage_reg[final_num];
+  
   // assign stage1[4] = { stage_reg[4][49:25] * $signed(w[0][36:18]) - stage_reg[4][24:0] * $signed(w[0][36:18]), stage_reg[4][49:25] * w[0][36:18] + stage_reg[4][24:0] * w[0][36:18] };
   // assign stage1[5] = { stage_reg[5][49:25] * $signed(w[1][36:18]) - stage_reg[5][24:0] * $signed(w[1][17:0]), stage_reg[5][49:25] * w[1][36:18] + stage_reg[5][24:0] * w[1][17:0] };
   // assign stage1[6] = { stage_reg[6][49:25] * $signed(w[2][17:0]) - stage_reg[6][24:0] * $signed(w[2][17:0]), stage_reg[6][49:25] * w[2][17:0] + stage_reg[6][24:0] * w[2][17:0] };
