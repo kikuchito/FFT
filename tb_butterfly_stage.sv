@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
+
 module tb_butterfly();
+
 logic [49:0] signal_store_tb      [7:0];
 logic [49:0] final_stage_store_tb [7:0];
 logic [49:0] signal_tb;
@@ -15,9 +17,8 @@ logic        tlast_tb;
 parameter CLK_PERIOD = 20; 
 parameter SIGNAL_COUNT = 7;
 parameter SIGNAL_SIZE = 50;
-
-parameter FILE_PATH_IN = "E:/vivado/vivado_proj/FFT/mem_in.txt";
-parameter FILE_PATH_OUT = "E:/vivado/vivado_proj/FFT/mem_out.txt";
+parameter FILE_PATH_IN = "C:/Users/Yslavinsky/FFTmem_in.txt";
+parameter FILE_PATH_OUT = "C:/Users/Yslavinsky/FFTmem_out.txt";
 // always begin
 //     #10 clk_i = ~clk_i;
 // end
@@ -48,6 +49,8 @@ wrapper_dut(
   .tlast(tlast_tb)
 );
 
+int fd;
+
 initial begin
   rst = '1;
   tvalid_tb = '0;
@@ -58,7 +61,7 @@ initial begin
   $readmemb("mem_in.txt", signal_store_tb, 0);
   
 
-  for (int i=0; i < 8; ++i) begin
+  for (int i=0; i < SIGNAL_COUNT + 1; ++i) begin
     #20
     tlast_tb = '0;
     tvalid_tb = '1;
@@ -72,31 +75,28 @@ initial begin
   #20
   tlast_tb = '0;
   tvalid_tb = '0;
-  
 
-  // if (final_num_tb == '0) begin
-  //   final_stage_store_tb[0] = final_stage_tb;
-  // end
-
-  case (final_num_tb) 
-    3'd0: final_stage_store_tb[final_num_tb] = final_stage_tb;
-    3'd1: final_stage_store_tb[final_num_tb] = final_stage_tb;
-    3'd2: final_stage_store_tb[final_num_tb] = final_stage_tb;
-    3'd3: final_stage_store_tb[final_num_tb] = final_stage_tb;
-    3'd4: final_stage_store_tb[final_num_tb] = final_stage_tb;
-    3'd5: final_stage_store_tb[final_num_tb] = final_stage_tb;
-    3'd6: final_stage_store_tb[final_num_tb] = final_stage_tb;
-    3'd7: final_stage_store_tb[final_num_tb] = final_stage_tb;
-  
-  endcase
-  
+ 
+ final_stage_store_tb[final_num_tb] = final_stage_tb;
+ for (int i = 1; i < SIGNAL_COUNT + 1; ++i ) begin
+  @(final_num_tb)
+  final_stage_store_tb[final_num_tb] = final_stage_tb;
+ end
 
  
 
 
 
-  $writememb("mem_out.txt", final_stage_store_tb, 0);
-
+  // $writememb("mem_out.txt", final_stage_store_tb, 0);
+   
+  fd = $fopen("mem_out.txt", "w");
+  if (fd) begin   
+    $display("File was opened succcessfully");
+    $fwrite(fd, final_stage_store_tb);
+    //  $writememb("mem_out.txt", final_stage_store_tb, 0);
+  end
+  else    $display("File was NOT opened succcessfully");
+  $fclose(fd);
 end
 // #20
 // num_of_signal_tb = 3'd0;
@@ -128,4 +128,3 @@ end
 
 
 endmodule
-
