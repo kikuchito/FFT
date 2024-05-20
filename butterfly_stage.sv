@@ -4,7 +4,7 @@
   module butterfly_stage #(parameter MAX_NUM_OF_SIGNALS = 3'd7, SIZE_OF_SIGNAL = 50, SIZE_OF_CONST = 36)(
     input  logic                         clk_i,
     input  logic                         rst_i,
-    input  logic                         tvalid,
+    // input  logic                         tvalid,
     input  logic  [SIZE_OF_SIGNAL - 1:0] signal,
     input  logic  [ 2:0]                 num_of_signal,
     input  logic                         signal_flag,
@@ -14,20 +14,23 @@
 
   //inner regs
  
-  logic        [SIZE_OF_SIGNAL - 1:0] signal_reg      [MAX_NUM_OF_SIGNALS:0];
-  logic signed [SIZE_OF_SIGNAL - 1:0] final_stage_reg [MAX_NUM_OF_SIGNALS:0];
-  logic        [35:0]                 w               [3:0];
-  logic signed [SIZE_OF_SIGNAL - 1:0] stage_reg       [MAX_NUM_OF_SIGNALS:0];
-  logic        [43:0]                 im              [3:0];
-  logic        [43:0]                 re              [3:0];
-  logic signed [SIZE_OF_SIGNAL - 1:0] stage1          [MAX_NUM_OF_SIGNALS:0];
-  logic signed [SIZE_OF_SIGNAL - 1:0] stage2          [MAX_NUM_OF_SIGNALS:0];
-  logic signed [SIZE_OF_SIGNAL - 1:0] stage2_reg      [MAX_NUM_OF_SIGNALS:0];
-  logic signed [SIZE_OF_SIGNAL - 1:0] stage3          [MAX_NUM_OF_SIGNALS:0];
-  logic signed [SIZE_OF_SIGNAL - 1:0] stage3_reg      [MAX_NUM_OF_SIGNALS:0];
+  logic        [SIZE_OF_SIGNAL - 1:0] signal_reg      [MAX_NUM_OF_SIGNALS    :0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] final_stage_reg [MAX_NUM_OF_SIGNALS    :0];
+  logic        [SIZE_OF_CONST  - 1:0] w               [3:0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage_reg       [MAX_NUM_OF_SIGNALS    :0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage1mutl      [MAX_NUM_OF_SIGNALS - 4:0];
+  // logic        [43:0]                 im              [3:0];
+  // logic        [43:0]                 re              [3:0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage1          [MAX_NUM_OF_SIGNALS    :0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage2          [MAX_NUM_OF_SIGNALS    :0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage2mutl      [MAX_NUM_OF_SIGNALS - 4:0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage2_reg      [MAX_NUM_OF_SIGNALS    :0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage3          [MAX_NUM_OF_SIGNALS    :0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage3mutl      [MAX_NUM_OF_SIGNALS - 4:0];
+  logic signed [SIZE_OF_SIGNAL - 1:0] stage3_reg      [MAX_NUM_OF_SIGNALS    :0];
 
 
-  logic  [ 2:0] final_num;
+  // logic  [ 2:0] final_num;
   // logic         end_flag;
   // logic         end_flag_reg;
 
@@ -42,22 +45,24 @@
       signal_reg[MAX_NUM_OF_SIGNALS][SIZE_OF_SIGNAL - 1:0] <= signal;
   end
 
-  always_comb begin
-    w[0] = { 18'b01_0000000000000000, 18'b0 };
+  // always_comb begin
+  //   w[0] = { 18'b01_0000000000000000, 18'b0 };
     
-    w[1] = { 18'b00_1011011000000000, 18'b10_1011011000000000 };
+  //   w[1] = { 18'b00_1011011000000000, 18'b10_1011011000000000 };
     
-    w[2] = { 18'b0, 18'b11_0000000000000000 };
+  //   w[2] = { 18'b0, 18'b11_0000000000000000 };
     
-    w[3] = { 18'b10_1011011000000000, 18'b10_1011011000000000 };
-  end
+  //   w[3] = { 18'b10_1011011000000000, 18'b10_1011011000000000 };
+  // end
       
+  initial $readmemb("w_coef_data.mem", w);
+
   // assign valid_reg_i = '1;
 
   assign stage_reg[0] = { $signed(signal_reg[0][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[4][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[0][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[4][SIZE_OF_SIGNAL / 2 - 1:0]) };
-  assign stage_reg[1] = { $signed(signal_reg[1][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[6][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[1][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[6][SIZE_OF_SIGNAL / 2 - 1:0]) };
-  assign stage_reg[2] = { $signed(signal_reg[2][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[7][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[2][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[7][SIZE_OF_SIGNAL / 2 - 1:0]) };
-  assign stage_reg[3] = { $signed(signal_reg[3][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[5][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[3][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[5][SIZE_OF_SIGNAL / 2 - 1:0]) };
+  assign stage_reg[1] = { $signed(signal_reg[1][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[5][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[1][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[5][SIZE_OF_SIGNAL / 2 - 1:0]) };
+  assign stage_reg[2] = { $signed(signal_reg[2][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[6][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[2][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[6][SIZE_OF_SIGNAL / 2 - 1:0]) };
+  assign stage_reg[3] = { $signed(signal_reg[3][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[7][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[3][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[7][SIZE_OF_SIGNAL / 2 - 1:0]) };
 
   assign stage_reg[4] = { $signed(signal_reg[0][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) - $signed(signal_reg[4][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[0][SIZE_OF_SIGNAL / 2 - 1:0]) - $signed(signal_reg[4][SIZE_OF_SIGNAL / 2 - 1:0]) }; 
   assign stage_reg[5] = { $signed(signal_reg[1][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) - $signed(signal_reg[5][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[1][SIZE_OF_SIGNAL / 2 - 1:0]) - $signed(signal_reg[5][SIZE_OF_SIGNAL / 2 - 1:0]) };
@@ -171,6 +176,7 @@
     .butterfly_stage_o(stage2[7])
   );
 
+
   assign stage3_reg[0] = { $signed(stage2[0][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(stage2[1][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(stage2[0][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(stage2[1][SIZE_OF_SIGNAL / 2 - 1:0]) };
   assign stage3_reg[1] = { $signed(stage2[0][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) - $signed(stage2[1][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(stage2[0][SIZE_OF_SIGNAL / 2 - 1:0]) - $signed(stage2[1][SIZE_OF_SIGNAL / 2 - 1:0]) };
   assign stage3_reg[2] = { $signed(stage2[2][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(stage2[3][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(stage2[2][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(stage2[3][SIZE_OF_SIGNAL / 2 - 1:0]) };
@@ -234,7 +240,7 @@
   always_ff @(posedge clk_i) begin
     if (rst_i || !signal_flag)
       final_num <= '0;
-    else if (final_stage_reg[7] != 49'bx && final_num != MAX_NUM_OF_SIGNALS)
+    else if (final_stage_reg[7] > 49'b0 && final_num != MAX_NUM_OF_SIGNALS)
       final_num <= final_num + 1'd1;
   end
 
@@ -246,5 +252,4 @@
   // end
 
   assign final_stage = final_stage_reg[final_num];
-  
   endmodule
