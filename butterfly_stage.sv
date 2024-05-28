@@ -29,11 +29,6 @@
   logic signed [SIZE_OF_SIGNAL - 1:0] stage3mutl      [MAX_NUM_OF_SIGNALS - 4:0];
   logic signed [SIZE_OF_SIGNAL - 1:0] stage3_reg      [MAX_NUM_OF_SIGNALS    :0];
 
-
-  // logic  [ 2:0] final_num;
-  // logic         end_flag;
-  // logic         end_flag_reg;
-
   logic       valid_reg_i [11:0];
   logic       valid_reg_o [11:0];
 
@@ -45,19 +40,7 @@
       signal_reg[MAX_NUM_OF_SIGNALS][SIZE_OF_SIGNAL - 1:0] <= signal;
   end
 
-  // always_comb begin
-  //   w[0] = { 18'b01_0000000000000000, 18'b0 };
-    
-  //   w[1] = { 18'b00_1011011000000000, 18'b10_1011011000000000 };
-    
-  //   w[2] = { 18'b0, 18'b11_0000000000000000 };
-    
-  //   w[3] = { 18'b10_1011011000000000, 18'b10_1011011000000000 };
-  // end
-      
-  initial $readmemb("w_coef_data.mem", w);
-
-  // assign valid_reg_i = '1;
+  initial $readmemb("C:/Users/Yslavinsky/FFT_git/fft/mem/w_coef_data.mem", w);
 
   assign stage_reg[0] = { $signed(signal_reg[0][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[4][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[0][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[4][SIZE_OF_SIGNAL / 2 - 1:0]) };
   assign stage_reg[1] = { $signed(signal_reg[1][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]) + $signed(signal_reg[5][SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2]), $signed(signal_reg[1][SIZE_OF_SIGNAL / 2 - 1:0]) + $signed(signal_reg[5][SIZE_OF_SIGNAL / 2 - 1:0]) };
@@ -77,7 +60,8 @@
   assign valid_reg_i [2] = '1;
   assign valid_reg_i [3] = '1;
 
-  dsp_mult dsp_mult_inst1(
+  dsp_mult #() 
+  dsp_mult_inst1(
     .clk_i(clk_i),
     .rst_i(rst_i),
     .stage_i(stage_reg[4]),
@@ -243,13 +227,6 @@
     else if (final_stage_reg[7] > 49'b0 && final_num != MAX_NUM_OF_SIGNALS)
       final_num <= final_num + 1'd1;
   end
-
-  // always_ff @(posedge clk_i) begin
-  //   if (rst_i)
-  //     end_flag_reg <= '0;
-  //   else if (final_stage_reg[7] != 49'bx)
-  //     end_flag_reg <= '1;
-  // end
 
   assign final_stage = final_stage_reg[final_num];
   endmodule

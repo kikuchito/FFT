@@ -1,57 +1,60 @@
 `timescale 1ns / 1ps
 
-  module dsp_mult(
-    input  logic         clk_i,
-    input  logic         rst_i,
-    input  logic  [49:0] stage_i,
-    input  logic  [35:0] w_i,
-    input  logic         data_valid_i,
-    output logic         data_valid_o,
-    output signed [49:0] butterfly_stage_o
+  module dsp_mult#(parameter SIZE_OF_SIGNAL = 50, SIZE_OF_CONST = 36)(
+    input  logic                           clk_i,
+    input  logic                           rst_i,
+    
+    input  logic  [SIZE_OF_SIGNAL - 1 : 0] stage_i,
+    input  logic  [SIZE_OF_CONST -  1 : 0] w_i,
+    
+    input  logic                           data_valid_i,
+    output logic                           data_valid_o,
+    
+    output signed [SIZE_OF_SIGNAL - 1:0]   butterfly_stage_o
   );
   
-  logic        [24:0] s_input_ff_re;
-  logic        [17:0] w_input_ff_re;
-  logic        [24:0] s_input_ff_im;
-  logic        [17:0] w_input_ff_im;
+  logic        [SIZE_OF_SIGNAL / 2 - 1 : 0] s_input_ff_re;
+  logic        [SIZE_OF_CONST / 2 -  1 : 0] w_input_ff_re;
+  logic        [SIZE_OF_SIGNAL / 2 - 1 : 0] s_input_ff_im;
+  logic        [SIZE_OF_CONST / 2 -  1 : 0] w_input_ff_im;
   
   //regs for real part
-  logic        [24:0] s_re_reg1;
-  logic        [24:0] s_re_reg2;
-  logic        [17:0] w_re_reg1;
-  logic        [17:0] w_re_reg2;
-  logic        [42:0] mult_re;
-  logic        [42:0] mult_reg_re;
-  logic signed [47:0] sum_re;
-  logic signed [47:0] sum_reg_re;
-  logic        [24:0] s_im_reg1;
-  logic        [17:0] w_im_reg1;
-  logic        [42:0] mult_im;
-  logic        [42:0] mult_reg_im1;
-  logic        [42:0] mult_reg_im2;
+  logic        [SIZE_OF_SIGNAL / 2 - 1 : 0] s_re_reg1;
+  logic        [SIZE_OF_SIGNAL / 2 - 1 : 0] s_re_reg2;
+  logic        [SIZE_OF_CONST / 2 -  1 : 0] w_re_reg1;
+  logic        [SIZE_OF_CONST / 2 -  1 : 0] w_re_reg2;
+  logic        [42:0]                       mult_re;
+  logic        [42:0]                       mult_reg_re;
+  logic signed [47:0]                       sum_re;
+  logic signed [47:0]                       sum_reg_re;
+  logic        [SIZE_OF_SIGNAL / 2 - 1 : 0] s_im_reg1;
+  logic        [SIZE_OF_CONST / 2 -  1 : 0] w_im_reg1;
+  logic        [42:0]                       mult_im;
+  logic        [42:0]                       mult_reg_im1;
+  logic        [42:0]                       mult_reg_im2;
 
   //regs for image part
-  logic        [17:0] w_im_reg2;
-  logic        [42:0] mult_Ab;
-  logic        [42:0] mult_aB;
-  logic        [42:0] reg1_mult_aB;
-  logic        [42:0] reg2_mult_aB;
-  logic        [42:0] reg_mult_Ab;
-  logic signed [47:0] sum_im;
-  logic signed [47:0] sum_reg_im;
+  logic        [SIZE_OF_CONST / 2 -  1 : 0] w_im_reg2;
+  logic        [42:0]                       mult_Ab;
+  logic        [42:0]                       mult_aB;
+  logic        [42:0]                       reg1_mult_aB;
+  logic        [42:0]                       reg2_mult_aB;
+  logic        [42:0]                       reg_mult_Ab;
+  logic signed [47:0]                       sum_im;
+  logic signed [47:0]                       sum_reg_im;
 
-  logic input_valid_ff;
-  logic data_valid_stage_1_ff;
-  logic data_valid_stage_2_ff;
-  logic data_valid_stage_3_ff;
-  logic data_valid_stage_4_ff;
-  logic output_valid_ff;
+  logic                                     input_valid_ff;
+  logic                                     data_valid_stage_1_ff;
+  logic                                     data_valid_stage_2_ff;
+  logic                                     data_valid_stage_3_ff;
+  logic                                     data_valid_stage_4_ff;
+  logic                                     output_valid_ff;
 
 
-  assign s_input_ff_re = stage_i[49:25];
-  assign w_input_ff_re = w_i[35:18];
-  assign s_input_ff_im = stage_i[24:0];
-  assign w_input_ff_im = w_i[17:0];
+  assign s_input_ff_re = stage_i[SIZE_OF_SIGNAL - 1 : SIZE_OF_SIGNAL / 2];
+  assign w_input_ff_re = w_i[SIZE_OF_CONST - 1 : SIZE_OF_CONST / 2];
+  assign s_input_ff_im = stage_i[SIZE_OF_SIGNAL / 2 - 1 : 0];
+  assign w_input_ff_im = w_i[SIZE_OF_CONST / 2 - 1 : 0];
   
 
   always_ff @ (posedge clk_i or posedge rst_i)
@@ -121,7 +124,7 @@
   assign clk2 = data_valid_stage_1_ff && clk_i;
   assign clk3 = data_valid_stage_2_ff && clk_i;
   assign clk4 = data_valid_stage_3_ff && clk_i;
-  assign data_valid_o = output_valid_ff;
+  assign data_valid_o = butterfly_stage_o > 49'b0;
   // assign clk5 = data_valid_stage_4_ff && clk_i;
 
   endmodule
