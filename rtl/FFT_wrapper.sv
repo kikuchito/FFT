@@ -47,26 +47,26 @@
     end
   end
 
-  // butterfly_stage #(MAX_NUM_OF_SIGNALS, SIZE_OF_SIGNAL) 
-  // butterfly_stage_inst(
-  //   .clk_i(clk_i),
-  //   .rst_i(reset_i),
-  //   .signal(signal_i),
-  //   .signal_flag(signal_flag_top),
-  //   .num_of_signal(num_of_signal_top),
-  //   .final_stage(final_stage),
-  //   .final_num(final_num_top)
-  // );
+  butterfly_stage #(MAX_NUM_OF_SIGNALS, SIZE_OF_SIGNAL) 
+  butterfly_stage_inst(
+    .clk_i(clk_i),
+    .rst_i(reset_i),
+    .signal(signal_i),
+    .signal_flag(signal_flag_top),
+    .num_of_signal(num_of_signal_top),
+    .final_stage(final_stage),
+    .final_num(final_num_top)
+  );
 
-    FFT_mem_in #(SIZE_OF_SIGNAL, MAX_NUM_OF_SIGNALS / 2 - 1)
-    FFT_mem_in_inst(
-      .clk_i(clk_i),
-      .addr_i(num_of_signal_top),
-      .data_i_1(signal_i),
-      .data_i_2(),
-      .we_i(),
-      .en_i(~signal_flag_top),
-      .data_o_1(signal_o),
-      .data_o_2()
-    );
+    // FFT_mem_in #(SIZE_OF_SIGNAL, MAX_NUM_OF_SIGNALS / 2 - 1)
+    // FFT_mem_in_inst(
+    //   .clk_i(clk_i),
+    //   .addr_i(num_of_signal_top),
+    //   .data_i_1(signal_i),
+    //   .data_i_2(),
+    //   .we_i(),
+    //   .en_i(~signal_flag_top),
+    //   .data_o_1(signal_o),
+    //   .data_o_2()
+    // );
 endmodule
